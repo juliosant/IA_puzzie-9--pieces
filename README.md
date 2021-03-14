@@ -1,2 +1,2 @@
-# Quebra-Cabeça-9-Lados
- Trabalho da Universidade
+# Montar quebra cabeça
+ IA - Busca em amplitude
