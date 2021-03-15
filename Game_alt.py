@@ -100,12 +100,15 @@ if __name__=='__main__':
         start()
 
         if x == final:
+            if op_sys == "Windows":
+                os.system("color 7")
             # Mostrar o caminho até o objetivo
             for index in _close:
                 if op_sys == "Linux":
                     os.system("clear")
                 elif op_sys == "Windows":
                     os.system("cls")
+                    
 
                 for index, value in enumerate(index):
                     for i, v in enumerate(value):
@@ -122,6 +125,7 @@ if __name__=='__main__':
                 os.system("clear")
             elif op_sys == "Windows":
                 os.system("cls")
+                
             
             for index, value in enumerate(x):
                 for i, v in enumerate(value):
