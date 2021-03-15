@@ -1,118 +1,86 @@
-
 import os
 import copy
+import time
+import platform
 
-class board:
-    def __init__(self):
-        self.name = name
-        self.board = board
-        self.boards = boards
-    
+#Detectar o sistema operacional
+op_sys = platform.system()
 
-    def printBoard(self):
-        print(name)
-        print(board)
+
+# Gerar filho de x para cada movimento executado
+def move_panel(row, col, rowP, colP):
+    global board_aux, x
+
+    board = copy.deepcopy(x)
+    aux = board[row][col]
+    board[row][col] = board[rowP][colP]
+    board[rowP][colP] = aux
+    if board not in _close:
+        if board not in _open:
+            board_aux.append(board.copy())
 
 
 # Movimentar painel
-def move_panel(position):
-    global x, _close, _open, count
+def map_panels(position):
+    global x, _close, _open
 
-    #for index in x:
-    #    print(index)
+    global board_aux
+    board_aux = []
 
     row = position[0]
     col = position[1]
-
-    board_aux = []
+    
     # Mover para cima
     if row+1 < 3:
-        board_up = copy.deepcopy(x)
-        aux = board_up[row][col]
-        board_up[row][col] = board_up[row+1][col]
-        board_up[row+1][col] = aux
-        #print('mover para cima')
-        #for index in board_up:
-        #    print(index)
-        if board_up not in _close:
-            if board_up not in _open:
-                # _open.append(board_up.copy())
-                board_aux.append(board_up.copy())
-    
+        move_panel(row, col, row+1, col)
+
     # Mover para direita
     if col-1 >= 0:
-        board_right = copy.deepcopy(x)
-        aux = board_right[row][col]
-        board_right[row][col] = board_right[row][col-1]
-        board_right[row][col-1] = aux
-        #print('mover para direita')
-        #for index in board_right:
-        #    print(index)
-        if board_right not in _close:
-            if board_right not in _open:
-                #_open.append(board_right.copy())
-                board_aux.append(board_right.copy())
+        move_panel(row, col, row, col-1)
 
     # Mover para baixo
     if row-1 >= 0:
-        board_down = copy.deepcopy(x)
-        aux = board_down[row][col]
-        board_down[row][col] = board_down[row-1][col]
-        board_down[row-1][col] = aux
-        #print('mover para baixo')
-        #for index in board_down:
-        #    print(index)
-        if board_down not in _close: 
-            if board_down not in _open:
-                #_open.append(board_down.copy())
-                board_aux.append(board_down.copy())
+        move_panel(row, col, row-1, col)
 
     # Mover para a esquerda
     if col+1 < 3:
-        board_left = copy.deepcopy(x)
-        aux = board_left[row][col]
-        board_left[row][col] = board_left[row][col+1]
-        board_left[row][col+1] = aux
-        #print('mover para esquerda')
-        #for index in board_left:
-        #    print(index)
-        if board_left not in _close:
-            if board_left not in _open:
-                # _open.append(board_left.copy())
-                board_aux.append(board_left.copy())
+        move_panel(row, col, row, col+1)
 
+    # Add valores filhos à aberto
     board_aux.reverse()
     for index in board_aux:
         _open.insert(0, index.copy())
     
-
-    print(f'add {x} x À fechado')
+    # Add estado atual à fechado
     _close.append(copy.deepcopy(x))
-    
 
+
+# Encontrar posição do valor vazio
 def empty_value():
     global x
 
-    for index in x:
-        if 0 in index:
-            return [x.index(index), index.index(0)]
+    for i in x:
+        if 0 in i:
+            return [x.index(i), i.index(0)]
 
 
+# Gerar posições de vazio e mapear movimentos
 def generate_child():
     position = empty_value()
-    #sprint(position)
-    #input()
-    move_panel(position)
+    map_panels(position)
 
-def start():
+
+def start(): # Atribuir o valor atual
     global _open, x
 
     x = _open[0].copy()
     del _open[0]
-    
+  
 
 if __name__=='__main__':
+    global _open, _close, x
 
+    # Valor 0 representa vazio
     initial = [
         [1,2,3], 
         [4,5,0], 
@@ -125,24 +93,46 @@ if __name__=='__main__':
         [0,7,8]
         ]
 
-    global _open
     _open = [initial]
-    global _close
     _close = []
-    global x
 
     while _open != []:
         start()
 
         if x == final:
-            walk = list(map(lambda lista: print(f'{lista[0]}\n{lista[1]}\n{lista[2]}\n  |\n  |'), _close))
-  
-            goal = list(map(lambda row: print(f'{row}'), x))
+            # Mostrar o caminho até o objetivo
+            for index in _close:
+                if op_sys == "Linux":
+                    os.system("clear")
+                elif op_sys == "Windows":
+                    os.system("cls")
+
+                for index, value in enumerate(index):
+                    for i, v in enumerate(value):
+                        if v == 0:
+                            print(' _ ', end=' ')
+                        else:
+                            print(f' {v} ', end=' ')
+                    print('')
+                #print("\n   | \n   |")
+                time.sleep(1)
+            
+            # Mostrar o objetivo
+            if op_sys == "Linux":
+                os.system("clear")
+            elif op_sys == "Windows":
+                os.system("cls")
+            
+            for index, value in enumerate(x):
+                for i, v in enumerate(value):
+                    if v == 0:
+                            print('\033[32m'+' _ '+'\033[32m', end=' ')
+                    else:
+                        print(f'\033[32m {v} \033[32m', end=' ')
+                print('')
+            print()
+            print('\033[32m'+'SUCESSO!!'+'\033[32m')
             break
+
         else:
             generate_child()
-
-    #del _open[0]
-    #print(_open[0])
-    #print(_open)
-    #prt1 = list(map(lambda lista: print(f'{lista[0]}\n{lista[1]}\n{lista[2]}\n  |\n  |'), _close))
